@@ -1,4 +1,4 @@
 package edu.gatech.cs2340.donationtracker;
 
-public class LoginActivity {
+public class User {
 }
