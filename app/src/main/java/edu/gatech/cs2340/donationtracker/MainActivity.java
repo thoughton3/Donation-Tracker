@@ -21,17 +21,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     //start up
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.login);
         username = (EditText) findViewById(R.id.editText4);
         password = (EditText) findViewById(R.id.editText3);
         LoginActivity users = new LoginActivity();
         users.addUser(new User("Thomas", "H"));
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.login);
+
     }
 
     public void onLogin(View view) {
         Snackbar snackbar = Snackbar.make(findViewById(R.id.Context), "Incorrect username and password combination", Snackbar.LENGTH_SHORT);
-        if (LoginActivity.login(new User(username.getText().toString(), password.getText().toString()))) {
+        if (username != null && password != null && LoginActivity.login(new User(username.getText().toString(), password.getText().toString()))) {
             setContentView(R.layout.activity_main);
         } else {
             snackbar.show();
