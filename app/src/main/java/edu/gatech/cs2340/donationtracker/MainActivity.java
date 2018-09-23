@@ -21,12 +21,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     //start up
     protected void onCreate(Bundle savedInstanceState) {
-        username = (EditText) findViewById(R.id.editText4);
-        password = (EditText) findViewById(R.id.editText3);
         LoginActivity users = new LoginActivity();
         users.addUser(new User("Thomas", "H"));
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login);
+        setContentView(R.layout.welcomescreen);
 
     }
 
@@ -49,5 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onWelcomeScreen(View view) {
         setContentView(R.layout.login);
+        username = (EditText) findViewById(R.id.editText4);
+        password = (EditText) findViewById(R.id.editText3);
     }
 }
