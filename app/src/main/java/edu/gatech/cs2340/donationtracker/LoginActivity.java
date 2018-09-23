@@ -7,4 +7,8 @@ public class LoginActivity {
     public void addUser(User user) {
         userData.put(user.getUsername(), user.getPassword());
     }
+
+    public boolean login(User user) {
+        return (userData.get(user.getUsername()).equals(user.getPassword()));
+    }
 }
