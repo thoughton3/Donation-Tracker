@@ -1,4 +1,4 @@
-package edu.gatech.cs2340.donationtracker;
+package edu.gatech.cs2340.donationtracker2;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
