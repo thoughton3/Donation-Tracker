@@ -21,4 +21,8 @@ public class MainActivity extends AppCompatActivity {
     public void onLogOut(View view) {
         setContentView(R.layout.welcomescreen);
     }
+
+    public void onWelcomeScreen(View view) {
+        setContentView(R.layout.login);
+    }
 }
