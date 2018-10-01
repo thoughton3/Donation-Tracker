@@ -80,8 +80,14 @@ public class MainActivity extends AppCompatActivity {
         firstName = (EditText) findViewById(R.id.editText);
         lastName = (EditText) findViewById(R.id.editText2);
         String name = firstName.getText().toString() + " " + lastName.getText().toString();
-        LoginActivity.addUser(new User(name, username.getText().toString(), password.getText().toString(), (AccountType) accountTypeSpinner.getSelectedItem()));
-        setContentView(R.layout.login);
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.Context), "Please fill out ALL fields!", Snackbar.LENGTH_SHORT);
+        if (!username.getText().toString().equals("") && !password.getText().toString().equals("") && !firstName.getText().toString().equals("") && !lastName.getText().toString().equals("")) {
+            LoginActivity.addUser(new User(name, username.getText().toString(), password.getText().toString(), (AccountType) accountTypeSpinner.getSelectedItem()));
+            setContentView(R.layout.login);
+        } else {
+            snackbar.show();
+        }
+
 
     }
 
