@@ -6,10 +6,12 @@ public class LoginActivity {
     private static HashMap<String, String> userData = new HashMap<>();
     private static ArrayList<User> userList = new ArrayList<>();
 
-    public static void addUser(User user) {
+    public static boolean addUser(User user) {
         if(userData.put(user.getUsername(), user.getPassword()) == null) {
             userList.add(user);
+            return true;
         }
+        return false;
     }
 
     public static boolean login(User user) {

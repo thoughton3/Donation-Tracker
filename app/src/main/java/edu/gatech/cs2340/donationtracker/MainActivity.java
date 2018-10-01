@@ -82,8 +82,12 @@ public class MainActivity extends AppCompatActivity {
         String name = firstName.getText().toString() + " " + lastName.getText().toString();
         Snackbar snackbar = Snackbar.make(findViewById(R.id.Context), "Please fill out ALL fields!", Snackbar.LENGTH_SHORT);
         if (!username.getText().toString().equals("") && !password.getText().toString().equals("") && !firstName.getText().toString().equals("") && !lastName.getText().toString().equals("")) {
-            LoginActivity.addUser(new User(name, username.getText().toString(), password.getText().toString(), (AccountType) accountTypeSpinner.getSelectedItem()));
-            setContentView(R.layout.login);
+            Snackbar snackbar2 = Snackbar.make(findViewById(R.id.Context), "Username is already taken", Snackbar.LENGTH_SHORT);
+            if (LoginActivity.addUser(new User(name, username.getText().toString(), password.getText().toString(), (AccountType) accountTypeSpinner.getSelectedItem()))) {
+                setContentView(R.layout.login);
+            } else {
+                snackbar2.show();
+            }
         } else {
             snackbar.show();
         }
