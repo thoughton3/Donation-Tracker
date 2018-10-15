@@ -1,4 +1,4 @@
-package edu.gatech.cs2340.donationtracker;
+package edu.gatech.cs2340.donationtracker.model;
 
 import java.util.ArrayList;
 

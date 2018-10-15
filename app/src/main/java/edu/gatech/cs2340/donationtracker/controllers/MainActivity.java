@@ -1,22 +1,19 @@
-package edu.gatech.cs2340.donationtracker;
+package edu.gatech.cs2340.donationtracker.controllers;
 
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.support.design.widget.Snackbar;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import edu.gatech.cs2340.donationtracker.model.AccountType;
+import edu.gatech.cs2340.donationtracker.model.LoginActivity;
+import edu.gatech.cs2340.donationtracker.R;
+import edu.gatech.cs2340.donationtracker.model.User;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,8 +27,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     //start up
     protected void onCreate(Bundle savedInstanceState) {
-        LoginActivity users = new LoginActivity();
-        users.addUser(new User("Thomas Houghton","Thomas", "H", AccountType.ADMIN));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcomescreen);
     }
