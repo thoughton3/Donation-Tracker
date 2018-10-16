@@ -3,16 +3,31 @@ package edu.gatech.cs2340.donationtracker.controllers;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.support.design.widget.Snackbar;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+
 import edu.gatech.cs2340.donationtracker.model.AccountType;
+import edu.gatech.cs2340.donationtracker.model.Location;
 import edu.gatech.cs2340.donationtracker.model.LoginActivity;
 import edu.gatech.cs2340.donationtracker.R;
+import edu.gatech.cs2340.donationtracker.model.Model;
 import edu.gatech.cs2340.donationtracker.model.User;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,12 +38,40 @@ public class MainActivity extends AppCompatActivity {
     private EditText lastName;
     private Spinner accountTypeSpinner;
     private User user;
+    private ArrayList<Location> locations;
+    private String[] names;
+    public static String TAG = "MY_APP";
+
+
 
     @Override
     //start up
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcomescreen);
+
+        names = new String[6];
+        Model model = Model.getInstance();
+        try {
+            InputStream is = getResources().openRawResource(R.raw.location_data);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            String line;
+            br.readLine();
+            int num = 0;
+            while ((line = br.readLine()) != null) {
+                String[] tokens = line.split(",");
+                Model.addLocation((new Location(tokens[1], tokens[8], tokens[3], tokens[2], tokens[4] + ", " + tokens[5] + ", " + tokens[6] + ", " +  tokens[7], tokens[9])));
+                names[num] = tokens[1];
+                num++;
+            }
+
+        } catch(IOException e) {
+            Log.e(MainActivity.TAG, "Error reading in location_data", e);
+        }
+
+
+
     }
 
     public void onLogin(View view) {
@@ -45,6 +88,22 @@ public class MainActivity extends AppCompatActivity {
         } else {
             snackbar.show();
         }
+        ListView listView = findViewById(R.id.location_list);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, names);
+
+        listView.setAdapter(adapter);
+
+        AdapterView.OnItemClickListener handler = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                setContentView(R.layout.location_info);
+                TextView info = findViewById(R.id.LocationInfo);
+                info.setText(Model.get(position).toString());
+            }
+        };
+        listView.setOnItemClickListener(handler);
+
     }
 
     public void onCancel(View view) {
@@ -88,6 +147,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    public void onGoBack(View view) {
+        setContentView(R.layout.activity_main);
+        ListView listView = findViewById(R.id.location_list);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, names);
+
+        listView.setAdapter(adapter);
+
+        AdapterView.OnItemClickListener handler = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                setContentView(R.layout.location_info);
+                TextView info = findViewById(R.id.LocationInfo);
+                info.setText(Model.get(position).toString());
+            }
+        };
+        listView.setOnItemClickListener(handler);
     }
 
 
