@@ -88,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         LoginActivity.addUsers(db.doa().getAllUsers());
+        if (db.doa().getAllUsers().size() == 0) {
+            Log.d(MainActivity.TAG, "EMPTY STILL..................");
+        }
         Model.addItems(db.doa().getAllItems());
 
 
