@@ -1,10 +1,16 @@
 package edu.gatech.cs2340.donationtracker.model;
+import android.arch.lifecycle.LiveData;
+import android.arch.persistence.room.Room;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class LoginActivity {
     private static HashMap<String, String> userData = new HashMap<>();
     private static ArrayList<User> userList = new ArrayList<>();
+    public static String TAG = "MY_APP";
 
     public static boolean addUser(User user) {
         if(userData.put(user.getUsername(), user.getPassword()) == null) {
@@ -12,6 +18,15 @@ public class LoginActivity {
             return true;
         }
         return false;
+    }
+
+    public static void addUsers(List<User> users) {
+        for (User user : users) {
+            if (user.getLocation() == null && user.getAccountType() == AccountType.LOCATION_EMPLOYEE) {
+                Log.d(LoginActivity.TAG, "CONVERTER DIDNT WORK....................");
+            }
+            addUser(user);
+        }
     }
 
     public static boolean login(User user) {
@@ -28,5 +43,9 @@ public class LoginActivity {
 
     public static AccountType getAccountType(String username) {
         return userList.get(userList.indexOf(new User(username, ""))).getAccountType();
+    }
+
+    public static Location getLocation(String username) {
+        return userList.get(userList.indexOf((new User(username, "")))).getLocation();
     }
 }
