@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         names = new String[6];
         Model model = Model.getInstance();
         db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "database-name").fallbackToDestructiveMigration().allowMainThreadQueries().build();
+                AppDatabase.class, "database-name").allowMainThreadQueries().build();
 
         try {
             InputStream is = getResources().openRawResource(R.raw.location_data);
@@ -127,11 +127,12 @@ public class MainActivity extends AppCompatActivity {
                 };
                 listView.setOnItemClickListener(handler);
             } else {
+                searchItems = false;
                 setContentView(R.layout.location_employee_page);
                 ListView listView = findViewById(R.id.item_list);
                 Location location = LoginActivity.getLocation(user.getUsername());
-                List<Item> locationItemList = db.doa().getAllItemsFromLocation(location.getLocationName());
-                String[] locationItemNameList = new String[locationItemList.size()];
+                final List<Item> locationItemList = db.doa().getAllItemsFromLocation(location.getLocationName());
+                final String[] locationItemNameList = new String[locationItemList.size()];
                 for (int i = 0; i < locationItemList.size(); i++) {
                     locationItemNameList[i] = locationItemList.get(i).getShortDescription();
                 }
@@ -144,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         setContentView(R.layout.item_info);
                         TextView info = findViewById(R.id.item_info);
-                        info.setText(Model.getItem(position).toString());
+                        info.setText(locationItemList.get(position).toString());
                     }
                 };
                 listView.setOnItemClickListener(handler);
@@ -251,8 +252,13 @@ public class MainActivity extends AppCompatActivity {
     public void onUpdateCancel(View view) {
         setContentView(R.layout.location_employee_page);
         ListView listView = findViewById(R.id.item_list);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Model.getItemListArray());
+        Location location = LoginActivity.getLocation(user.getUsername());
+        final List<Item> locationItemList = db.doa().getAllItemsFromLocation(location.getLocationName());
+        final String[] locationItemNameList = new String[locationItemList.size()];
+        for (int i = 0; i < locationItemList.size(); i++) {
+            locationItemNameList[i] = locationItemList.get(i).getShortDescription();
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, locationItemNameList);
 
         listView.setAdapter(adapter);
 
@@ -261,14 +267,13 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 setContentView(R.layout.item_info);
                 TextView info = findViewById(R.id.item_info);
-                info.setText(Model.getItem(position).toString());
+                info.setText(locationItemList.get(position).toString());
             }
         };
         listView.setOnItemClickListener(handler);
         String userName = LoginActivity.getName(user.getUsername());
         AccountType userAccountType = LoginActivity.getAccountType(user.getUsername());
         TextView welcomeMessage = findViewById(R.id.location_employee);
-        Location location = LoginActivity.getLocation(user.getUsername());
         welcomeMessage.setText("Welcome " + userAccountType.getValue() + " of " + location + ": " + userName + "!");
 
     }
@@ -281,14 +286,19 @@ public class MainActivity extends AppCompatActivity {
         EditText comments = findViewById(R.id.comments);
         setContentView(R.layout.location_employee_page);
         Location location = LoginActivity.getLocation(user.getUsername());
+        final List<Item> locationItemList = db.doa().getAllItemsFromLocation(location.getLocationName());
+        final String[] locationItemNameList = new String[locationItemList.size()];
+        for (int i = 0; i < locationItemList.size(); i++) {
+            locationItemNameList[i] = locationItemList.get(i).getShortDescription();
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, locationItemNameList);
+
         Item item = new Item(shortDescription.getText().toString(), fullDescription.getText().toString(), Double.parseDouble(value.getText().toString()), (ItemType) categories.getSelectedItem(), comments.getText().toString(), location);
         Model.addItem(item);
 
         db.doa().insertItem(item);
 
         ListView listView = findViewById(R.id.item_list);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Model.getItemListArray());
 
         listView.setAdapter(adapter);
 
@@ -298,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
                 searchItems = false;
                 setContentView(R.layout.item_info);
                 TextView info = findViewById(R.id.item_info);
-                info.setText(Model.getItem(position).toString());
+                info.setText(locationItemList.get(position).toString());
             }
         };
         listView.setOnItemClickListener(handler);
@@ -312,6 +322,7 @@ public class MainActivity extends AppCompatActivity {
         if (searchItems) {
             setContentView(R.layout.searched_items);
             List<Item> searchResults = db.doa().getAllItemsFromLocation(searchString);
+            final List<Item> searchResults2 = db.doa().getAllItemsFromLocation(searchString);
             if (searchResults.size() == 0) {
                 Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
             }
@@ -331,15 +342,21 @@ public class MainActivity extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     setContentView(R.layout.item_info);
                     TextView info = findViewById(R.id.item_info);
-                    info.setText(Model.getItem(position).toString());
+                    info.setText(searchResults2.get(position).toString());
                 }
             };
             listView.setOnItemClickListener(handler);
         } else {
             setContentView(R.layout.location_employee_page);
             ListView listView = findViewById(R.id.item_list);
+            Location location = LoginActivity.getLocation(user.getUsername());
+            final List<Item> locationItemList = db.doa().getAllItemsFromLocation(location.getLocationName());
+            final String[] locationItemNameList = new String[locationItemList.size()];
+            for (int i = 0; i < locationItemList.size(); i++) {
+                locationItemNameList[i] = locationItemList.get(i).getShortDescription();
+            }
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, locationItemNameList);
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Model.getItemListArray());
 
             listView.setAdapter(adapter);
 
@@ -348,14 +365,13 @@ public class MainActivity extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     setContentView(R.layout.item_info);
                     TextView info = findViewById(R.id.item_info);
-                    info.setText(Model.getItem(position).toString());
+                    info.setText(locationItemList.get(position).toString());
                 }
             };
             listView.setOnItemClickListener(handler);
             String userName = LoginActivity.getName(user.getUsername());
             AccountType userAccountType = LoginActivity.getAccountType(user.getUsername());
             TextView welcomeMessage = findViewById(R.id.location_employee);
-            Location location = LoginActivity.getLocation(user.getUsername());
             welcomeMessage.setText("Welcome " + userAccountType.getValue() + " of " + location + ": " + userName + "!");
         }
     }
@@ -403,9 +419,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.searched_items);
         String[] itemResults;
         Snackbar snackbar = Snackbar.make(findViewById(R.id.Context2), "No Results were found", Snackbar.LENGTH_SHORT);
+        final List<Item> searchResults;
         if (!searchLocation) {
             if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
-                List<Item> searchResults = db.doa().getAllItemsByNameSearch(searchString);
+                searchResults = db.doa().getAllItemsByNameSearch(searchString);
                 if (searchResults.size() == 0) {
                     Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                     snackbar.show();
@@ -416,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 Log.d(MainActivity.TAG, categorySpinner.getSelectedItem().toString());
-                List<Item> searchResults = db.  doa().getAllItemsByCategory((String)categorySpinner.getSelectedItem().toString());
+                searchResults = db.  doa().getAllItemsByCategory((String)categorySpinner.getSelectedItem().toString());
                 if (searchResults.size() == 0) {
                     Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                     snackbar.show();
@@ -439,14 +456,14 @@ public class MainActivity extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     setContentView(R.layout.item_info);
                     TextView info = findViewById(R.id.item_info);
-                    info.setText(Model.getItem(position).toString());
+                    info.setText(searchResults.get(position).toString());
                 }
             };
             listView.setOnItemClickListener(handler);
         } else {
             Log.d(MainActivity.TAG, storeLocation.getLocationName());
             if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
-                List<Item> searchResults = db.doa().getAllItemsAtLocationByNameSearch(storeLocation.getLocationName(), searchString);
+                searchResults = db.doa().getAllItemsAtLocationByNameSearch(storeLocation.getLocationName(), searchString);
                 if (searchResults.size() == 0) {
                     Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                     snackbar.show();
@@ -456,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
                     itemResults[i] = searchResults.get(i).getShortDescription();
                 }
             } else {
-                List<Item> searchResults = db.doa().getAllItemsAtLocationByCategory(storeLocation.getLocationName(), (String)categorySpinner.getSelectedItem().toString());
+                searchResults = db.doa().getAllItemsAtLocationByCategory(storeLocation.getLocationName(), (String)categorySpinner.getSelectedItem().toString());
                 if (searchResults.size() == 0) {
                     Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                     snackbar.show();
@@ -477,7 +494,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     setContentView(R.layout.item_info);
                     TextView info = findViewById(R.id.item_info);
-                    info.setText(Model.getItem(position).toString());
+                    info.setText(searchResults.get(position).toString());
                 }
             };
             listView.setOnItemClickListener(handler);
