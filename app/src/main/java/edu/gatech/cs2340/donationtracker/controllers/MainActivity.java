@@ -1,6 +1,7 @@
 package edu.gatech.cs2340.donationtracker.controllers;
 
 import android.arch.persistence.room.Room;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.provider.SettingsSlicesContract;
 import android.support.design.widget.BaseTransientBottomBar;
@@ -283,17 +284,19 @@ public class MainActivity extends AppCompatActivity {
         EditText comments = findViewById(R.id.comments);
         setContentView(R.layout.location_employee_page);
         Location location = LoginActivity.getLocation(user.getUsername());
+        Item item = new Item(shortDescription.getText().toString(), fullDescription.getText().toString(), Double.parseDouble(value.getText().toString()), (ItemType) categories.getSelectedItem(), comments.getText().toString(), location);
+        Model.addItem(item);
+
+        db.doa().insertItem(item);
+
+
+
         final List<Item> locationItemList = db.doa().getAllItemsFromLocation(location.getLocationName());
         final String[] locationItemNameList = new String[locationItemList.size()];
         for (int i = 0; i < locationItemList.size(); i++) {
             locationItemNameList[i] = locationItemList.get(i).getShortDescription();
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, locationItemNameList);
-
-        Item item = new Item(shortDescription.getText().toString(), fullDescription.getText().toString(), Double.parseDouble(value.getText().toString()), (ItemType) categories.getSelectedItem(), comments.getText().toString(), location);
-        Model.addItem(item);
-
-        db.doa().insertItem(item);
 
         ListView listView = findViewById(R.id.item_list);
 
@@ -318,31 +321,88 @@ public class MainActivity extends AppCompatActivity {
     public void onGoBackLocationEmployee(View view) {
         if (searchItems) {
             setContentView(R.layout.searched_items);
-            List<Item> searchResults = db.doa().getAllItemsFromLocation(searchString);
-            final List<Item> searchResults2 = db.doa().getAllItemsFromLocation(searchString);
-            if (searchResults.size() == 0) {
-                Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
-            }
-            String[] itemResults = new String[searchResults.size()];
-            for (int i = 0; i < searchResults.size(); i++) {
-                itemResults[i] = searchResults.get(i).getShortDescription();
-            }
-
-            ListView listView = findViewById(R.id.search_results);
-
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, itemResults);
-
-            listView.setAdapter(adapter);
-
-            AdapterView.OnItemClickListener handler = new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    setContentView(R.layout.item_info);
-                    TextView info = findViewById(R.id.item_info);
-                    info.setText(searchResults2.get(position).toString());
+            String[] itemResults;
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.Context2), "No Results were found", Snackbar.LENGTH_SHORT);
+            final List<Item> searchResults;
+            if (!searchLocation) {
+                if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
+                    searchResults = db.doa().getAllItemsByNameSearch(searchString);
+                    if (searchResults.size() == 0) {
+                        Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
+                        snackbar.show();
+                    }
+                    itemResults = new String[searchResults.size()];
+                    for (int i = 0; i < searchResults.size(); i++) {
+                        itemResults[i] = searchResults.get(i).getShortDescription();
+                    }
+                } else {
+                    Log.d(MainActivity.TAG, categorySpinner.getSelectedItem().toString());
+                    searchResults = db.  doa().getAllItemsByCategory((String)categorySpinner.getSelectedItem().toString());
+                    if (searchResults.size() == 0) {
+                        Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
+                        snackbar.show();
+                    }
+                    itemResults = new String[searchResults.size()];
+                    for (int i = 0; i < searchResults.size(); i++) {
+                        itemResults[i] = searchResults.get(i).getShortDescription();
+                    }
                 }
-            };
-            listView.setOnItemClickListener(handler);
+
+
+                ListView listView = findViewById(R.id.search_results);
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, itemResults);
+
+                listView.setAdapter(adapter);
+
+                AdapterView.OnItemClickListener handler = new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        setContentView(R.layout.item_info);
+                        TextView info = findViewById(R.id.item_info);
+                        info.setText(searchResults.get(position).toString());
+                    }
+                };
+                listView.setOnItemClickListener(handler);
+            } else {
+                Log.d(MainActivity.TAG, storeLocation.getLocationName());
+                if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
+                    searchResults = db.doa().getAllItemsAtLocationByNameSearch(storeLocation.getLocationName(), searchString);
+                    if (searchResults.size() == 0) {
+                        Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
+                        snackbar.show();
+                    }
+                    itemResults = new String[searchResults.size()];
+                    for (int i = 0; i < searchResults.size(); i++) {
+                        itemResults[i] = searchResults.get(i).getShortDescription();
+                    }
+                } else {
+                    searchResults = db.doa().getAllItemsAtLocationByCategory(storeLocation.getLocationName(), (String)categorySpinner.getSelectedItem().toString());
+                    if (searchResults.size() == 0) {
+                        Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
+                        snackbar.show();
+                    }
+                    itemResults = new String[searchResults.size()];
+                    for (int i = 0; i < searchResults.size(); i++) {
+                        itemResults[i] = searchResults.get(i).getShortDescription();
+                    }
+                }
+                ListView listView = findViewById(R.id.search_results);
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, itemResults);
+
+                listView.setAdapter(adapter);
+
+                AdapterView.OnItemClickListener handler = new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        setContentView(R.layout.item_info);
+                        TextView info = findViewById(R.id.item_info);
+                        info.setText(searchResults.get(position).toString());
+                    }
+                };
+                listView.setOnItemClickListener(handler);
+            }
         } else {
             setContentView(R.layout.location_employee_page);
             ListView listView = findViewById(R.id.item_list);
@@ -532,6 +592,11 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter2 = new ArrayAdapter(this, android.R.layout.simple_spinner_item, ItemType.values());
         adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(adapter2);
+    }
+
+    public void onMapClick(View view) {
+        Intent map = new Intent(this, MapsActivity.class);
+        startActivity(map);
     }
 
 

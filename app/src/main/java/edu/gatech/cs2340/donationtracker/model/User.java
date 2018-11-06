@@ -18,9 +18,9 @@ public class User {
     @ColumnInfo(name = "name")
     private String name;
     @PrimaryKey
-    @NonNull
+
     @ColumnInfo(name = "username")
-    private String username;
+    @NonNull private String username = "";
     @ColumnInfo(name = "password")
     private String password;
     @ColumnInfo(name = "account_type")
@@ -40,7 +40,7 @@ public class User {
         this(name, username, password, accountType, (Location) null);
     }
 
-    public User(String name, String username, String password, AccountType accountType, Location location) {
+    public User(String name, @NonNull String username, String password, AccountType accountType, Location location) {
         this.name = name;
         this.username = username;
         this.password = password;
@@ -55,7 +55,7 @@ public class User {
 
     }
     @Ignore
-    public User(String name, String username, String password, AccountType accountType, String locationName) {
+    public User(String name, @NonNull String username, String password, AccountType accountType, String locationName) {
         this.name = name;
         this.username = username;
         this.password = password;
@@ -68,11 +68,11 @@ public class User {
 
     }
 
-    public String getUsername() {
+    public @NonNull String getUsername() {
         return this.username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(@NonNull String username) {
         this.username = username;
     }
 
