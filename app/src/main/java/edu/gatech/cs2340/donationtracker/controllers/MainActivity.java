@@ -1,5 +1,6 @@
 package edu.gatech.cs2340.donationtracker.controllers;
 
+//import android.arch.persistence.room.Room;
 import android.arch.persistence.room.Room;
 import android.os.AsyncTask;
 import android.provider.SettingsSlicesContract;
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         LoginActivity.addUsers(db.doa().getAllUsers());
-        if (db.doa().getAllUsers().size() == 0) {
+        if (db.doa().getAllUsers() == null) {
             Log.d(MainActivity.TAG, "EMPTY STILL..................");
         }
         Model.addItems(db.doa().getAllItems());
