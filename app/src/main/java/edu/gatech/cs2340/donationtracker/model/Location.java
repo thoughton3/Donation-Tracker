@@ -32,6 +32,18 @@ public class Location {
         return locationName;
     }
 
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
     public String toString() {
         return locationName;
     }

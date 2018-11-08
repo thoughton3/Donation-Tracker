@@ -9,7 +9,6 @@ import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-
 import edu.gatech.cs2340.donationtracker.controllers.MainActivity;
 
 @Entity(tableName = "users")
@@ -19,6 +18,7 @@ public class User {
     @ColumnInfo(name = "name")
     private String name;
     @PrimaryKey
+
     @ColumnInfo(name = "username")
     @NonNull private String username = "";
     @ColumnInfo(name = "password")
@@ -63,6 +63,10 @@ public class User {
         this.locationName = locationName;
     }
 
+    @Ignore
+    public User(){
+
+    }
 
     public @NonNull String getUsername() {
         return this.username;
