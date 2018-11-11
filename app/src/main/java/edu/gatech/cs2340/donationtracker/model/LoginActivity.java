@@ -13,6 +13,9 @@ public class LoginActivity {
     public static String TAG = "MY_APP";
 
     public static boolean addUser(User user) {
+        if (user == null) {
+            return false;
+        }
         if(userData.put(user.getUsername(), user.getPassword()) == null) {
             userList.add(user);
             return true;
@@ -22,9 +25,6 @@ public class LoginActivity {
 
     public static void addUsers(List<User> users) {
         for (User user : users) {
-            if (user.getLocation() == null && user.getAccountType() == AccountType.LOCATION_EMPLOYEE) {
-                Log.d(LoginActivity.TAG, "CONVERTER DIDNT WORK....................");
-            }
             addUser(user);
         }
     }
@@ -47,5 +47,9 @@ public class LoginActivity {
 
     public static Location getLocation(String username) {
         return userList.get(userList.indexOf((new User(username, "")))).getLocation();
+    }
+
+    public static ArrayList<User> getUserList() {
+        return userList;
     }
 }

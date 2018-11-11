@@ -11,7 +11,7 @@ public class DonationTrackerRepository {
 
     public DonationTrackerRepository(Application application) {
         AppDatabase db = AppDatabase.getINSTANCE(application);
-        mDao = db.doa();
+        mDao = db.dao();
 
     }
 
