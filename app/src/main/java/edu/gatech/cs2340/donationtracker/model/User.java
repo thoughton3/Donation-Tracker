@@ -45,7 +45,6 @@ public class User {
         this.username = username;
         this.password = password;
         this.accountType = accountType;
-        Log.d(MainActivity.TAG, "HERE................" );
         this.location = location;
         if (location != null) {
             this.locationName = location.getLocationName();

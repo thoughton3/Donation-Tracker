@@ -13,7 +13,7 @@ import android.content.Context;
 @Database(entities = {User.class, Item.class}, version = 4, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
-    public abstract Dao doa();
+    public abstract Dao dao();
     private static AppDatabase INSTANCE;
 
     static AppDatabase getINSTANCE(Context context) {

@@ -1,6 +1,5 @@
 package edu.gatech.cs2340.donationtracker.controllers;
 
-//import android.arch.persistence.room.Room;
 import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -89,11 +88,8 @@ public class MainActivity extends AppCompatActivity {
             Log.e(MainActivity.TAG, "Error reading in location_data", e);
         }
 
-        LoginActivity.addUsers(db.doa().getAllUsers());
-        if (db.doa().getAllUsers() == null) {
-            Log.d(MainActivity.TAG, "EMPTY STILL..................");
-        }
-        Model.addItems(db.doa().getAllItems());
+        LoginActivity.addUsers(db.dao().getAllUsers());
+        Model.addItems(db.dao().getAllItems());
 
 
 
@@ -133,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 setContentView(R.layout.location_employee_page);
                 ListView listView = findViewById(R.id.item_list);
                 Location location = LoginActivity.getLocation(user.getUsername());
-                final List<Item> locationItemList = db.doa().getAllItemsFromLocation(location.getLocationName());
+                final List<Item> locationItemList = db.dao().getAllItemsFromLocation(location.getLocationName());
                 final String[] locationItemNameList = new String[locationItemList.size()];
                 for (int i = 0; i < locationItemList.size(); i++) {
                     locationItemNameList[i] = locationItemList.get(i).getShortDescription();
@@ -205,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
             loginUser = new User(name, username.getText().toString(), password.getText().toString(), (AccountType) accountTypeSpinner.getSelectedItem(), (Location) locationSpinner.getSelectedItem());
             if (LoginActivity.addUser(loginUser)) {
                 final User loginUser2 = new User(name, username.getText().toString(), password.getText().toString(), (AccountType) accountTypeSpinner.getSelectedItem(), (Location) locationSpinner.getSelectedItem());
-                db.doa().insertUser(loginUser2);
+                db.dao().insertUser(loginUser2);
 
 
 
@@ -255,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.location_employee_page);
         ListView listView = findViewById(R.id.item_list);
         Location location = LoginActivity.getLocation(user.getUsername());
-        final List<Item> locationItemList = db.doa().getAllItemsFromLocation(location.getLocationName());
+        final List<Item> locationItemList = db.dao().getAllItemsFromLocation(location.getLocationName());
         final String[] locationItemNameList = new String[locationItemList.size()];
         for (int i = 0; i < locationItemList.size(); i++) {
             locationItemNameList[i] = locationItemList.get(i).getShortDescription();
@@ -291,11 +287,11 @@ public class MainActivity extends AppCompatActivity {
         Item item = new Item(shortDescription.getText().toString(), fullDescription.getText().toString(), Double.parseDouble(value.getText().toString()), (ItemType) categories.getSelectedItem(), comments.getText().toString(), location);
         Model.addItem(item);
 
-        db.doa().insertItem(item);
+        db.dao().insertItem(item);
 
 
 
-        final List<Item> locationItemList = db.doa().getAllItemsFromLocation(location.getLocationName());
+        final List<Item> locationItemList = db.dao().getAllItemsFromLocation(location.getLocationName());
         final String[] locationItemNameList = new String[locationItemList.size()];
         for (int i = 0; i < locationItemList.size(); i++) {
             locationItemNameList[i] = locationItemList.get(i).getShortDescription();
@@ -330,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
             final List<Item> searchResults;
             if (!searchLocation) {
                 if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
-                    searchResults = db.doa().getAllItemsByNameSearch(searchString);
+                    searchResults = db.dao().getAllItemsByNameSearch(searchString);
                     if (searchResults.size() == 0) {
                         Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                         snackbar.show();
@@ -341,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     Log.d(MainActivity.TAG, categorySpinner.getSelectedItem().toString());
-                    searchResults = db.  doa().getAllItemsByCategory((String)categorySpinner.getSelectedItem().toString());
+                    searchResults = db.  dao().getAllItemsByCategory((String)categorySpinner.getSelectedItem().toString());
                     if (searchResults.size() == 0) {
                         Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                         snackbar.show();
@@ -371,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Log.d(MainActivity.TAG, storeLocation.getLocationName());
                 if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
-                    searchResults = db.doa().getAllItemsAtLocationByNameSearch(storeLocation.getLocationName(), searchString);
+                    searchResults = db.dao().getAllItemsAtLocationByNameSearch(storeLocation.getLocationName(), searchString);
                     if (searchResults.size() == 0) {
                         Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                         snackbar.show();
@@ -381,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
                         itemResults[i] = searchResults.get(i).getShortDescription();
                     }
                 } else {
-                    searchResults = db.doa().getAllItemsAtLocationByCategory(storeLocation.getLocationName(), (String)categorySpinner.getSelectedItem().toString());
+                    searchResults = db.dao().getAllItemsAtLocationByCategory(storeLocation.getLocationName(), (String)categorySpinner.getSelectedItem().toString());
                     if (searchResults.size() == 0) {
                         Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                         snackbar.show();
@@ -411,7 +407,7 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.location_employee_page);
             ListView listView = findViewById(R.id.item_list);
             Location location = LoginActivity.getLocation(user.getUsername());
-            final List<Item> locationItemList = db.doa().getAllItemsFromLocation(location.getLocationName());
+            final List<Item> locationItemList = db.dao().getAllItemsFromLocation(location.getLocationName());
             final String[] locationItemNameList = new String[locationItemList.size()];
             for (int i = 0; i < locationItemList.size(); i++) {
                 locationItemNameList[i] = locationItemList.get(i).getShortDescription();
@@ -483,7 +479,7 @@ public class MainActivity extends AppCompatActivity {
         final List<Item> searchResults;
         if (!searchLocation) {
             if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
-                searchResults = db.doa().getAllItemsByNameSearch(searchString);
+                searchResults = db.dao().getAllItemsByNameSearch(searchString);
                 if (searchResults.size() == 0) {
                     Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                     snackbar.show();
@@ -494,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 Log.d(MainActivity.TAG, categorySpinner.getSelectedItem().toString());
-                searchResults = db.  doa().getAllItemsByCategory((String)categorySpinner.getSelectedItem().toString());
+                searchResults = db.  dao().getAllItemsByCategory((String)categorySpinner.getSelectedItem().toString());
                 if (searchResults.size() == 0) {
                     Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                     snackbar.show();
@@ -524,7 +520,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d(MainActivity.TAG, storeLocation.getLocationName());
             if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
-                searchResults = db.doa().getAllItemsAtLocationByNameSearch(storeLocation.getLocationName(), searchString);
+                searchResults = db.dao().getAllItemsAtLocationByNameSearch(storeLocation.getLocationName(), searchString);
                 if (searchResults.size() == 0) {
                     Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                     snackbar.show();
@@ -534,7 +530,7 @@ public class MainActivity extends AppCompatActivity {
                     itemResults[i] = searchResults.get(i).getShortDescription();
                 }
             } else {
-                searchResults = db.doa().getAllItemsAtLocationByCategory(storeLocation.getLocationName(), (String)categorySpinner.getSelectedItem().toString());
+                searchResults = db.dao().getAllItemsAtLocationByCategory(storeLocation.getLocationName(), (String)categorySpinner.getSelectedItem().toString());
                 if (searchResults.size() == 0) {
                     Log.d(MainActivity.TAG, "DIDNT WORK ...........................");
                     snackbar.show();
