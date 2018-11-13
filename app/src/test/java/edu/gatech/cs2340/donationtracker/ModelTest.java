@@ -1,5 +1,6 @@
 package edu.gatech.cs2340.donationtracker;
 
+import android.view.Display;
 import org.junit.Test;
 import org.junit.Before;
 
@@ -97,5 +98,23 @@ public class ModelTest {
         ArrayList<User> emptyList = new ArrayList<>();
         LoginActivity.addUsers(emptyList);
         assert(LoginActivity.getUserList().size() == 3);
+    }
+
+    @Test
+    public void getLocationStringListTest() {
+        ArrayList<Location> locations = new ArrayList<>();
+        Location one = new Location("Atlanta", "City", "33.7490° N", "84.3880° W", "310 10th Street NW", "9145528754");
+        Location two = new Location("New York", "City", "45.3333° N", "90.4555° W", "530 Shore Acres Drive", "9145528754");
+        Location three = new Location("Microsoft", "Headquarters", "45.0000", "50.0000", "One Microsoft Way ", "45673428889");
+        Model.addLocation(one);
+        Model.addLocation(two);
+        Model.addLocation(three);
+        locations.add(one);
+        locations.add(two);
+        locations.add(three);
+        for (int i = 0; i < locations.size(); i++) {
+            assert(Model.getLocationStringList().get(i).equals(locations.get(i).getLocationName()));
+        }
+        assert(Model.getLocationStringList().size() == 3);
     }
 }
