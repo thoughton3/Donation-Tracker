@@ -62,11 +62,7 @@ public class User {
         this.password = password;
         this.accountType = accountType;
         this.location = location;
-        if (location != null) {
-            this.locationName = location.getLocationName();
-        } else {
-            this.locationName = "";
-        }
+
 
     }
 
