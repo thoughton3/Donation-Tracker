@@ -2,16 +2,27 @@ package edu.gatech.cs2340.donationtracker.model;
 
 import android.arch.persistence.room.TypeConverter;
 
-import java.util.ArrayList;
 
-
+/**
+ * represents a Converter
+ */
 public class Converters {
 
+    /**
+     * takes an accountType and makes it a String
+     * @param type the accountType
+     * @return the accountType as a String
+     */
     @TypeConverter
     public static String fromAccountTypeToString(AccountType type) {
         return type.getValue();
     }
 
+    /**
+     * takes a String and makes it an accountType
+     * @param string the String being converted
+     * @return the accountType
+     */
     @TypeConverter
     public static AccountType fromStringToAccountType(String string) {
         if (string.equals(AccountType.USER.getValue())) {
@@ -25,9 +36,20 @@ public class Converters {
         }
     }
 
+    /**
+     * takes a Location and makes it a String
+     * @param location the Location being converted
+     * @return the String of the Location
+     */
     @TypeConverter
-    public static String fromLocationToString(Location location) { return location.getLocationName();}
+    public static String fromLocationToString(Location location)
+    { return location.getLocationName();}
 
+    /**
+     * takes a String and converts it to a Location
+     * @param string the String being converted
+     * @return the Location representation of the String
+     */
     @TypeConverter
     public static Location fromStringToLocation(String string) {
         for (Location location : Model.getLocationList()) {
@@ -38,11 +60,21 @@ public class Converters {
         return null;
     }
 
+    /**
+     * takes an itemType and makes it a String
+     * @param type the itemType being converted
+     * @return the String of the itemType
+     */
     @TypeConverter
     public static String fromItemTypeToString(ItemType type) {
         return type.getValue();
     }
 
+    /**
+     * converts a String to an itemType
+     * @param string the String being converted
+     * @return the itemType of the String
+     */
     @TypeConverter
     public static ItemType fromStringToItemType(String string) {
         if (string.equals(ItemType.CLOTHING.getValue())) {

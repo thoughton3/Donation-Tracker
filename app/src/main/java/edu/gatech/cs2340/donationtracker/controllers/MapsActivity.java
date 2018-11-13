@@ -14,6 +14,9 @@ import edu.gatech.cs2340.donationtracker.R;
 import edu.gatech.cs2340.donationtracker.model.Location;
 import edu.gatech.cs2340.donationtracker.model.Model;
 
+/**
+ * this class contains all of the map activity
+ */
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -47,10 +50,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
         for (Location location : Model.getLocationList()) {
-            LatLng marker = new LatLng(Double.parseDouble(location.getLatitude()), Double.parseDouble(location.getLongitude()));
-            mMap.addMarker(new MarkerOptions().position(marker).title(location.getLocationName()).snippet(location.getPhoneNumber()));
+            LatLng marker = new LatLng(Double.parseDouble(location.getLatitude()),
+                    Double.parseDouble(location.getLongitude()));
+            mMap.addMarker(
+                    new MarkerOptions().position(marker).title(location.getLocationName()).snippet(
+                            location.getPhoneNumber()));
         }
-        LatLng atlanta = new LatLng(33.7490, -84.3880);
+        double atllat = 33.7490;
+        double atllong = -84.3880;
+        LatLng atlanta = new LatLng(atllat, atllong);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(atlanta, 10));
     }
 }

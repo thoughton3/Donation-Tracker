@@ -5,16 +5,14 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.nfc.Tag;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import edu.gatech.cs2340.donationtracker.controllers.MainActivity;
 
+/**
+ * this class represents a User
+ */
 @Entity(tableName = "users")
 public class User {
-    @Ignore
-    private static String TAG = "My_App";
     @ColumnInfo(name = "name")
     private String name;
     @PrimaryKey
@@ -25,22 +23,40 @@ public class User {
     private String password;
     @ColumnInfo(name = "account_type")
     private AccountType accountType;
-    @Ignore
-    private String accountTypeString;
     private Location location;
-    @Ignore
-    private String locationName;
 
+    /**
+     * constructs a User object
+     * @param username the username of the User
+     * @param password the password of the User
+     */
     @Ignore
     public User(String username, String password) {
         this("No Name", username, password, AccountType.USER);
     }
+
+    /**
+     * constructs a User object
+     * @param name the name of the User
+     * @param username the username of the User
+     * @param password the password of the User
+     * @param accountType the accountType of the User
+     */
     @Ignore
     public User(String name, String username, String password, AccountType accountType) {
         this(name, username, password, accountType, (Location) null);
     }
 
-    public User(String name, @NonNull String username, String password, AccountType accountType, Location location) {
+    /**
+     * constructs a User
+     * @param name the name of the User
+     * @param username the username of the User
+     * @param password the password of the User
+     * @param accountType the accountType of the User
+     * @param location the location of the User
+     */
+    public User(String name, @NonNull String username, String password,
+                AccountType accountType, Location location) {
         this.name = name;
         this.username = username;
         this.password = password;
@@ -53,8 +69,18 @@ public class User {
         }
 
     }
+
+    /**
+     * constructs a User
+     * @param name the name of the User
+     * @param username the username of the User
+     * @param password the password of the User
+     * @param accountType the accountType of the User
+     * @param locationName the locationName of the User
+     */
     @Ignore
-    public User(String name, @NonNull String username, String password, AccountType accountType, String locationName) {
+    public User(String name, @NonNull String username, String password,
+                AccountType accountType, String locationName) {
         this.name = name;
         this.username = username;
         this.password = password;
@@ -62,58 +88,64 @@ public class User {
         this.locationName = locationName;
     }
 
+    /**
+     * constructs a User
+     */
     @Ignore
     public User(){
 
     }
 
-    public @NonNull String getUsername() {
+    /**
+     * getter for User's username
+     * @return the username of the User
+     */
+    @NonNull public String getUsername() {
         return this.username;
     }
 
-    public void setUsername(@NonNull String username) {
-        this.username = username;
-    }
 
+
+    /**
+     * getter for User's password
+     * @return the password of the User
+     */
     public String getPassword() {
         return this.password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
+
+    /**
+     * getter for User's name
+     * @return name the name of the User
+     */
     public String getName() { return this.name;}
 
-    public void setName(String name) { this.name = name;}
 
+    /**
+     * getter for accountType of User
+     * @return the accountType of the User
+     */
     public AccountType getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(AccountType accountType) {
-        this.accountType = accountType;
-    }
 
+
+    /**
+     * getter for location of the User
+     * @return the location of the User
+     */
     public Location getLocation() { return location;}
 
+    /**
+     * setter for the location of the User
+     * @param location the location of the User being set
+     */
     public void setLocation(Location location) { this.location = location;}
 
-    public String getAccountTypeString() {
-        return accountTypeString;
-    }
 
-    public void setAccountTypeString(String accountTypeString) {
-        this.accountTypeString = accountTypeString;
-    }
-
-    public String getLocationName() {
-        return locationName;
-    }
-
-    public void setLocationName(String locationName) {
-        this.locationName = locationName;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -124,8 +156,9 @@ public class User {
         if (o == this) {
             return true;
         }
-
-        return this.getUsername().equals(((User) o).getUsername());
+        String username1 = this.getUsername();
+        String username2 = ((User) o).getUsername();
+        return username1.equals(username2);
 
     }
 
