@@ -1,9 +1,12 @@
 package edu.gatech.cs2340.donationtracker.model;
 
+import android.arch.persistence.room.Query;
+
 import java.util.List;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.RoomDatabase;
+
 
 
 @android.arch.persistence.room.Dao

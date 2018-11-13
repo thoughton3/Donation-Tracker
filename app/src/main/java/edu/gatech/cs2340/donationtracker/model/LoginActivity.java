@@ -1,6 +1,6 @@
 package edu.gatech.cs2340.donationtracker.model;
 import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Room;
+//import android.arch.persistence.room.Room;
 import android.util.Log;
 
 import java.util.ArrayList;

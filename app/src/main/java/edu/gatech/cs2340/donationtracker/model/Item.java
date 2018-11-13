@@ -7,11 +7,12 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+
 @Entity(tableName = "items")
 public class Item {
     @PrimaryKey
-    @NonNull
     @ColumnInfo(name = "short_description")
+    @NonNull
     private String shortDescription;
     private String fullDescription;
     private double value;
