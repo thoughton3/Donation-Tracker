@@ -53,7 +53,8 @@ public class Converters {
     @TypeConverter
     public static Location fromStringToLocation(String string) {
         for (Location location : Model.getLocationList()) {
-            if (location.getLocationName().equals(string)) {
+            String name  = location.getLocationName();
+            if (name.equals(string)) {
                 return location;
             }
         }

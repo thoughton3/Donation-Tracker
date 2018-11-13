@@ -77,7 +77,8 @@ public class Model {
     public static String[] getItemListArray () {
         String[] items = new String[itemList.size()];
         for (int i = 0; i < itemList.size(); i++) {
-            items[i] = itemList.get(i).getShortDescription();
+            Item item  = itemList.get(i);
+            items[i] = item.getShortDescription();
         }
         return items;
     }

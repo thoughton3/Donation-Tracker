@@ -1,10 +1,8 @@
 package edu.gatech.cs2340.donationtracker.model;
 
-
 /**
  * represents the drop off locations
  */
-@SuppressWarnings("TypeMayBeWeakened")
 public class Location {
     private final String locationName;
     private final String locationType;
@@ -38,8 +36,8 @@ public class Location {
      * @return a String containing the information of a location
      */
     public CharSequence getLocationInfo() {
-        return "Location Name: " + locationName + "\nLocation Type: " +
-                locationType + "\nLongitude: " +
+        return "Location Name: " + locationName + "\nLocation Type: "
+                + locationType + "\nLongitude: " +
                 longitude + "\nLatitude: " + latitude + "\nAddress: " + address +
                 "\nPhone Number: " + phoneNumber;
     }
@@ -82,6 +80,8 @@ public class Location {
 
     @Override
     public boolean equals(Object obj) {
-        return this.getLocationName().equals(((Location) obj).getLocationName());
+        String name = this.getLocationName();
+        return (obj instanceof Location) &&
+                (name.equals(((Location) obj).getLocationName()));
     }
 }

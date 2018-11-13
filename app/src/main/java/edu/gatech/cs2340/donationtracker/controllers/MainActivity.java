@@ -2,6 +2,7 @@ package edu.gatech.cs2340.donationtracker.controllers;
 
 import android.arch.persistence.room.Room;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,9 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ListAdapter;
+import android.text.Editable;
+import android.arch.persistence.room.RoomDatabase.Builder;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +28,7 @@ import java.util.List;
 
 import edu.gatech.cs2340.donationtracker.model.AccountType;
 import edu.gatech.cs2340.donationtracker.model.AppDatabase;
+import edu.gatech.cs2340.donationtracker.model.Dao;
 import edu.gatech.cs2340.donationtracker.model.Item;
 import edu.gatech.cs2340.donationtracker.model.ItemType;
 import edu.gatech.cs2340.donationtracker.model.Location;
@@ -46,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner itemTypeSpinner;
     private String[] names;
     private User user;
-    public final static String TAG = "MY_APP";
+    private static final String TAG = "MY_APP";
     private AppDatabase db;
     private boolean searchLocation;
     private boolean searchItems;
@@ -63,11 +68,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcomescreen);
         names = new String[6];
-        db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "database-name").allowMainThreadQueries().build();
+        Builder<edu.gatech.cs2340.donationtracker.model.AppDatabase> builder =
+                Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "database-name");
+        Builder<edu.gatech.cs2340.donationtracker.model.AppDatabase> allow =
+                builder.allowMainThreadQueries();
+        db = allow.build();
 
         try {
-            InputStream is = getResources().openRawResource(R.raw.location_data);
+            Resources resources = getResources();
+            InputStream is = resources.openRawResource(R.raw.location_data);
 
             BufferedReader br =
                     new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
@@ -87,8 +97,9 @@ public class MainActivity extends AppCompatActivity {
             Log.e(MainActivity.TAG, "Error reading in location_data", e);
         }
 
-        LoginActivity.addUsers(db.dao().getAllUsers());
-        Model.addItems(db.dao().getAllItems());
+        Dao dao = db.dao();
+        LoginActivity.addUsers(dao.getAllUsers());
+        Model.addItems(dao.getAllItems());
 
 
 
@@ -99,15 +110,17 @@ public class MainActivity extends AppCompatActivity {
      * @param view the current state of the app
      */
     public void onLogin(View view) {
-        username = (EditText) findViewById(R.id.editText4);
-        password = (EditText) findViewById(R.id.editText3);
+        username = findViewById(R.id.editText4);
+        password = findViewById(R.id.editText3);
+        Editable usernameString = username.getText();
+        Editable passwordString = password.getText();
 
         Snackbar snackbar = Snackbar.make(findViewById(R.id.Context),
                 "Incorrect username and password combination", Snackbar.LENGTH_SHORT);
-        if (username != null && password != null &&
-                LoginActivity.login(new User(username.getText().toString(),
-                        password.getText().toString()))) {
-            user = new User(username.getText().toString(), "");
+        if ((username != null) && (password != null) &&
+                (LoginActivity.login(new User(usernameString.toString(),
+                        passwordString.toString())))) {
+            user = new User(usernameString.toString(), "");
             String userName = LoginActivity.getName(user.getUsername());
             AccountType userAccountType = LoginActivity.getAccountType(user.getUsername());
             if (userAccountType != AccountType.LOCATION_EMPLOYEE) {
@@ -128,21 +141,24 @@ public class MainActivity extends AppCompatActivity {
                                             View view, int position, long id) {
                         setContentView(R.layout.location_info);
                         TextView info = findViewById(R.id.LocationInfo);
-                        info.setText(Model.get(position).getLocationInfo());
+                        Location location = Model.get(position);
+                        info.setText(location.getLocationInfo());
                         storeLocation = Model.get(position);
                     }
                 };
                 listView.setOnItemClickListener(handler);
             } else {
                 searchItems = false;
+                Dao dao = db.dao();
                 setContentView(R.layout.location_employee_page);
                 ListView listView = findViewById(R.id.item_list);
                 Location location = LoginActivity.getLocation(user.getUsername());
                 final List<Item> locationItemList =
-                        db.dao().getAllItemsFromLocation(location.getLocationName());
+                        dao.getAllItemsFromLocation(location.getLocationName());
                 final String[] locationItemNameList = new String[locationItemList.size()];
                 for (int i = 0; i < locationItemList.size(); i++) {
-                    locationItemNameList[i] = locationItemList.get(i).getShortDescription();
+                    Item item = locationItemList.get(i);
+                    locationItemNameList[i] = item.getShortDescription();
                 }
                 ListAdapter adapter =
                         new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
@@ -156,7 +172,9 @@ public class MainActivity extends AppCompatActivity {
                                             int position, long id) {
                         setContentView(R.layout.item_info);
                         TextView info = findViewById(R.id.item_info);
-                        info.setText(locationItemList.get(position).toString());
+                        Item item = locationItemList.get(position);
+                        String text = item.toString();
+                        info.setText(text);
                     }
                 };
                 listView.setOnItemClickListener(handler);
@@ -228,31 +246,36 @@ public class MainActivity extends AppCompatActivity {
      */
     //Registers account passed in
     public void onRegisterAccount(View view) {
-        username = (EditText) findViewById(R.id.editText5);
-        password = (EditText) findViewById(R.id.editText6);
-        firstName = (EditText) findViewById(R.id.editText);
-        lastName = (EditText) findViewById(R.id.editText2);
+        username =  findViewById(R.id.editText5);
+        password =  findViewById(R.id.editText6);
+        firstName =  findViewById(R.id.editText);
+        lastName =  findViewById(R.id.editText2);
 
-        String name = firstName.getText().toString() + " " + lastName.getText().toString();
+        Editable first = firstName.getText();
+        Editable last = lastName.getText();
+        Editable usernameString = username.getText();
+        Editable passwordString = password.getText();
+        String name = first.toString() + " " + last.toString();
         Snackbar snackbar = Snackbar.make(findViewById(R.id.Context),
                 "Please fill out ALL fields!", Snackbar.LENGTH_SHORT);
-        if (!username.getText().toString().equals("") &&
-                !password.getText().toString().equals("") &&
-                !firstName.getText().toString().equals("") &&
-                !lastName.getText().toString().equals("")) {
+        if (!("").equals(usernameString.toString()) &&
+                !("").equals(passwordString.toString()) &&
+                !("").equals(first.toString()) &&
+                !("").equals(last.toString())) {
             Snackbar snackbar2 = Snackbar.make(findViewById(R.id.Context),
                     "Username is already taken", Snackbar.LENGTH_SHORT);
             User loginUser;
-            loginUser = new User(name, username.getText().toString(),
-                    password.getText().toString(),
+            loginUser = new User(name, usernameString.toString(),
+                    passwordString.toString(),
                     (AccountType) accountTypeSpinner.getSelectedItem(),
                     (Location) locationSpinner.getSelectedItem());
             if (LoginActivity.addUser(loginUser)) {
-                final User loginUser2 = new User(name, username.getText().toString(),
-                        password.getText().toString(),
+                final User loginUser2 = new User(name, usernameString.toString(),
+                        passwordString.toString(),
                         (AccountType) accountTypeSpinner.getSelectedItem(),
                         (Location) locationSpinner.getSelectedItem());
-                db.dao().insertUser(loginUser2);
+                Dao dao = db.dao();
+                dao.insertUser(loginUser2);
 
 
 
@@ -286,7 +309,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 setContentView(R.layout.location_info);
                 TextView info = findViewById(R.id.LocationInfo);
-                info.setText(Model.get(position).getLocationInfo());
+                Location location = Model.get(position);
+                info.setText(location.getLocationInfo());
             }
         };
         listView.setOnItemClickListener(handler);
@@ -322,11 +346,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.location_employee_page);
         ListView listView = findViewById(R.id.item_list);
         Location location = LoginActivity.getLocation(user.getUsername());
+        Dao dao = db.dao();
         final List<Item> locationItemList =
-                db.dao().getAllItemsFromLocation(location.getLocationName());
+                dao.getAllItemsFromLocation(location.getLocationName());
         final String[] locationItemNameList = new String[locationItemList.size()];
         for (int i = 0; i < locationItemList.size(); i++) {
-            locationItemNameList[i] = locationItemList.get(i).getShortDescription();
+            Item item = locationItemList.get(i);
+            locationItemNameList[i] = item.getShortDescription();
         }
         ListAdapter adapter =
                 new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
@@ -339,15 +365,17 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 setContentView(R.layout.item_info);
                 TextView info = findViewById(R.id.item_info);
-                info.setText(locationItemList.get(position).toString());
+                Item item = locationItemList.get(position);
+                info.setText(item.toString());
             }
         };
         listView.setOnItemClickListener(handler);
         String userName = LoginActivity.getName(user.getUsername());
         AccountType userAccountType = LoginActivity.getAccountType(user.getUsername());
         TextView welcomeMessage = findViewById(R.id.location_employee);
-        welcomeMessage.setText("Welcome " + userAccountType.getValue() +
-                " of " + location + ": " + userName + "!");
+        String message = "Welcome " + userAccountType.getValue() +
+                " of " + location + ": " + userName + "!";
+        welcomeMessage.setText(message);
 
     }
 
@@ -362,22 +390,28 @@ public class MainActivity extends AppCompatActivity {
         Spinner categories = findViewById(R.id.category);
         EditText comments = findViewById(R.id.comments);
         setContentView(R.layout.location_employee_page);
-        Location location = LoginActivity.getLocation(user.getUsername());
-        Item item = new Item(shortDescription.getText().toString(),
-                fullDescription.getText().toString(),
-                Double.parseDouble(value.getText().toString()),
-                (ItemType) categories.getSelectedItem(), comments.getText().toString(), location);
+        final Location location = LoginActivity.getLocation(user.getUsername());
+        Editable shortDesc = shortDescription.getText();
+        Editable fullDesc = fullDescription.getText();
+        Editable valueString = value.getText();
+        Editable commentsString = comments.getText();
+        Item item = new Item(shortDesc.toString(),
+                fullDesc.toString(),
+                Double.parseDouble(valueString.toString()),
+                (ItemType) categories.getSelectedItem(), commentsString.toString(), location);
         Model.addItem(item);
 
-        db.dao().insertItem(item);
+        Dao dao = db.dao();
+        dao.insertItem(item);
 
 
 
         final List<Item> locationItemList =
-                db.dao().getAllItemsFromLocation(location.getLocationName());
+            dao.getAllItemsFromLocation(location.getLocationName());
         final String[] locationItemNameList = new String[locationItemList.size()];
         for (int i = 0; i < locationItemList.size(); i++) {
-            locationItemNameList[i] = locationItemList.get(i).getShortDescription();
+            Item item2 = locationItemList.get(i);
+            locationItemNameList[i] = item2.getShortDescription();
         }
         ListAdapter adapter =
                 new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
@@ -393,15 +427,17 @@ public class MainActivity extends AppCompatActivity {
                 searchItems = false;
                 setContentView(R.layout.item_info);
                 TextView info = findViewById(R.id.item_info);
-                info.setText(locationItemList.get(position).toString());
+                Item item = locationItemList.get(position);
+                info.setText(item.toString());
             }
         };
         listView.setOnItemClickListener(handler);
         String userName = LoginActivity.getName(user.getUsername());
         AccountType userAccountType = LoginActivity.getAccountType(user.getUsername());
         TextView welcomeMessage = findViewById(R.id.location_employee);
-        welcomeMessage.setText("Welcome " + userAccountType.getValue() + " of " +
-                location + ": " + userName + "!");
+        String text = "Welcome " + userAccountType.getValue() + " of " +
+                location + ": " + userName + "!";
+        welcomeMessage.setText(text);
     }
 
     /**
@@ -416,27 +452,33 @@ public class MainActivity extends AppCompatActivity {
                     "No Results were found", Snackbar.LENGTH_SHORT);
             final List<Item> searchResults;
             if (!searchLocation) {
-                if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
-                    searchResults = db.dao().getAllItemsByNameSearch(searchString);
+                if ("Search by Short Description".equals(searchSpinner.getSelectedItem())) {
+                    Dao dao = db.dao();
+                    searchResults = dao.getAllItemsByNameSearch(searchString);
                     if (searchResults.isEmpty()) {
                         Log.d(MainActivity.TAG, "DIDN'T WORK ...........................");
                         snackbar.show();
                     }
                     itemResults = new String[searchResults.size()];
                     for (int i = 0; i < searchResults.size(); i++) {
-                        itemResults[i] = searchResults.get(i).getShortDescription();
+                        Item item = searchResults.get(i);
+                        itemResults[i] = item.getShortDescription();
                     }
                 } else {
-                    Log.d(MainActivity.TAG, categorySpinner.getSelectedItem().toString());
-                    searchResults = db.  dao().getAllItemsByCategory(
-                            (String)categorySpinner.getSelectedItem().toString());
+                    Object spinnerSelected = categorySpinner.getSelectedItem();
+                    Log.d(MainActivity.TAG, spinnerSelected.toString());
+                    Object spinnerResults = categorySpinner.getSelectedItem();
+                    Dao dao = db.dao();
+                    searchResults = dao.getAllItemsByCategory(
+                            spinnerResults.toString());
                     if (searchResults.isEmpty()) {
                         Log.d(MainActivity.TAG, "DIDN'T WORK ...........................");
                         snackbar.show();
                     }
                     itemResults = new String[searchResults.size()];
                     for (int i = 0; i < searchResults.size(); i++) {
-                        itemResults[i] = searchResults.get(i).getShortDescription();
+                        Item item = searchResults.get(i);
+                        itemResults[i] = item.getShortDescription();
                     }
                 }
 
@@ -455,14 +497,16 @@ public class MainActivity extends AppCompatActivity {
                                             int position, long id) {
                         setContentView(R.layout.item_info);
                         TextView info = findViewById(R.id.item_info);
-                        info.setText(searchResults.get(position).toString());
+                        Item item = searchResults.get(position);
+                        info.setText(item.toString());
                     }
                 };
                 listView.setOnItemClickListener(handler);
             } else {
                 Log.d(MainActivity.TAG, storeLocation.getLocationName());
-                if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
-                    searchResults = db.dao().getAllItemsAtLocationByNameSearch(
+                if ("Search by Short Description".equals(searchSpinner.getSelectedItem())) {
+                    Dao dao = db.dao();
+                    searchResults = dao.getAllItemsAtLocationByNameSearch(
                             storeLocation.getLocationName(), searchString);
                     if (searchResults.isEmpty()) {
                         Log.d(MainActivity.TAG, "DIDN'T WORK ...........................");
@@ -470,19 +514,23 @@ public class MainActivity extends AppCompatActivity {
                     }
                     itemResults = new String[searchResults.size()];
                     for (int i = 0; i < searchResults.size(); i++) {
-                        itemResults[i] = searchResults.get(i).getShortDescription();
+                        Item item = searchResults.get(i);
+                        itemResults[i] = item.getShortDescription();
                     }
                 } else {
-                    searchResults = db.dao().getAllItemsAtLocationByCategory(
+                    Object spinnerSelected = categorySpinner.getSelectedItem();
+                    Dao dao = db.dao();
+                    searchResults = dao.getAllItemsAtLocationByCategory(
                             storeLocation.getLocationName(),
-                            (String)categorySpinner.getSelectedItem().toString());
+                            spinnerSelected.toString());
                     if (searchResults.isEmpty()) {
                         Log.d(MainActivity.TAG, "DIDN'T WORK ...........................");
                         snackbar.show();
                     }
                     itemResults = new String[searchResults.size()];
                     for (int i = 0; i < searchResults.size(); i++) {
-                        itemResults[i] = searchResults.get(i).getShortDescription();
+                        Item item = searchResults.get(i);
+                        itemResults[i] = item.getShortDescription();
                     }
                 }
                 ListView listView = findViewById(R.id.search_results);
@@ -498,7 +546,8 @@ public class MainActivity extends AppCompatActivity {
                                             int position, long id) {
                         setContentView(R.layout.item_info);
                         TextView info = findViewById(R.id.item_info);
-                        info.setText(searchResults.get(position).toString());
+                        Item item = searchResults.get(position);
+                        info.setText(item.toString());
                     }
                 };
                 listView.setOnItemClickListener(handler);
@@ -507,11 +556,13 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.location_employee_page);
             ListView listView = findViewById(R.id.item_list);
             Location location = LoginActivity.getLocation(user.getUsername());
+            Dao dao = db.dao();
             final List<Item> locationItemList =
-                    db.dao().getAllItemsFromLocation(location.getLocationName());
+                    dao.getAllItemsFromLocation(location.getLocationName());
             final String[] locationItemNameList = new String[locationItemList.size()];
             for (int i = 0; i < locationItemList.size(); i++) {
-                locationItemNameList[i] = locationItemList.get(i).getShortDescription();
+                Item item = locationItemList.get(i);
+                locationItemNameList[i] = item.getShortDescription();
             }
             ListAdapter adapter =
                     new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
@@ -525,15 +576,17 @@ public class MainActivity extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     setContentView(R.layout.item_info);
                     TextView info = findViewById(R.id.item_info);
-                    info.setText(locationItemList.get(position).toString());
+                    Item item = locationItemList.get(position);
+                    info.setText(item.toString());
                 }
             };
             listView.setOnItemClickListener(handler);
             String userName = LoginActivity.getName(user.getUsername());
             AccountType userAccountType = LoginActivity.getAccountType(user.getUsername());
             TextView welcomeMessage = findViewById(R.id.location_employee);
-            welcomeMessage.setText("Welcome " + userAccountType.getValue() + " of " +
-                    location + ": " + userName + "!");
+            String text = "Welcome " + userAccountType.getValue() + " of " +
+                    location + ": " + userName + "!";
+            welcomeMessage.setText(text);
         }
     }
 
@@ -593,7 +646,8 @@ public class MainActivity extends AppCompatActivity {
     public void onSearch(View view) {
         searchItems = true;
         EditText searchText = findViewById(R.id.search_text);
-        searchString = searchText.getText().toString();
+        Editable search = searchText.getText();
+        searchString = search.toString();
         Log.d(MainActivity.TAG, searchString + ".....................................");
         setContentView(R.layout.searched_items);
         String[] itemResults;
@@ -602,27 +656,33 @@ public class MainActivity extends AppCompatActivity {
                         Snackbar.LENGTH_SHORT);
         final List<Item> searchResults;
         if (!searchLocation) {
-            if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
-                searchResults = db.dao().getAllItemsByNameSearch(searchString);
+            if ("Search by Short Description".equals("Search by Short Description")) {
+                Dao dao = db.dao();
+                searchResults = dao.getAllItemsByNameSearch(searchString);
                 if (searchResults.isEmpty()) {
                     Log.d(MainActivity.TAG, "DIDN'T WORK ...........................");
                     snackbar.show();
                 }
                 itemResults = new String[searchResults.size()];
                 for (int i = 0; i < searchResults.size(); i++) {
-                    itemResults[i] = searchResults.get(i).getShortDescription();
+                    Item item = searchResults.get(i);
+                    itemResults[i] = item.getShortDescription();
                 }
             } else {
-                Log.d(MainActivity.TAG, categorySpinner.getSelectedItem().toString());
-                searchResults = db.  dao().getAllItemsByCategory(
-                        (String)categorySpinner.getSelectedItem().toString());
+                Object selectedSpinner = categorySpinner.getSelectedItem();
+                Log.d(MainActivity.TAG, selectedSpinner.toString());
+                Object selectedSpinner2 = categorySpinner.getSelectedItem();
+                Dao dao = db.dao();
+                searchResults = dao.getAllItemsByCategory(
+                        selectedSpinner2.toString());
                 if (searchResults.isEmpty()) {
                     Log.d(MainActivity.TAG, "DIDN'T WORK ...........................");
                     snackbar.show();
                 }
                 itemResults = new String[searchResults.size()];
                 for (int i = 0; i < searchResults.size(); i++) {
-                    itemResults[i] = searchResults.get(i).getShortDescription();
+                    Item item = searchResults.get(i);
+                    itemResults[i] = item.getShortDescription();
                 }
             }
 
@@ -639,15 +699,17 @@ public class MainActivity extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     setContentView(R.layout.item_info);
                     TextView info = findViewById(R.id.item_info);
-                    info.setText(searchResults.get(position).toString());
+                    Item item = searchResults.get(position);
+                    info.setText(item.toString());
                 }
             };
             listView.setOnItemClickListener(handler);
         } else {
             Log.d(MainActivity.TAG, storeLocation.getLocationName());
-            if (searchSpinner.getSelectedItem().equals("Search by Short Description")) {
+            if ("Search by Short Description".equals(searchSpinner.getSelectedItem())) {
+                Dao dao = db.dao();
                 searchResults =
-                        db.dao().getAllItemsAtLocationByNameSearch(storeLocation.getLocationName(),
+                        dao.getAllItemsAtLocationByNameSearch(storeLocation.getLocationName(),
                                 searchString);
                 if (searchResults.isEmpty()) {
                     Log.d(MainActivity.TAG, "DIDN'T WORK ...........................");
@@ -655,19 +717,23 @@ public class MainActivity extends AppCompatActivity {
                 }
                 itemResults = new String[searchResults.size()];
                 for (int i = 0; i < searchResults.size(); i++) {
-                    itemResults[i] = searchResults.get(i).getShortDescription();
+                    Item item = searchResults.get(i);
+                    itemResults[i] = item.getShortDescription();
                 }
             } else {
+                Object selectedSpinner = categorySpinner.getSelectedItem();
+                Dao dao = db.dao();
                 searchResults =
-                        db.dao().getAllItemsAtLocationByCategory(storeLocation.getLocationName(),
-                                (String)categorySpinner.getSelectedItem().toString());
+                        dao.getAllItemsAtLocationByCategory(storeLocation.getLocationName(),
+                                selectedSpinner.toString());
                 if (searchResults.isEmpty()) {
                     Log.d(MainActivity.TAG, "DIDN'T WORK ...........................");
                     snackbar.show();
                 }
                 itemResults = new String[searchResults.size()];
                 for (int i = 0; i < searchResults.size(); i++) {
-                    itemResults[i] = searchResults.get(i).getShortDescription();
+                    Item item = searchResults.get(i);
+                    itemResults[i] = item.getShortDescription();
                 }
             }
             ListView listView = findViewById(R.id.search_results);
@@ -683,7 +749,8 @@ public class MainActivity extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     setContentView(R.layout.item_info);
                     TextView info = findViewById(R.id.item_info);
-                    info.setText(searchResults.get(position).toString());
+                    Item item = searchResults.get(position);
+                    info.setText(item.toString());
                 }
             };
             listView.setOnItemClickListener(handler);
@@ -708,7 +775,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 setContentView(R.layout.location_info);
                 TextView info = findViewById(R.id.LocationInfo);
-                info.setText(Model.get(position).getLocationInfo());
+                Location location = Model.get(position);
+                info.setText(location.getLocationInfo());
                 storeLocation = Model.get(position);
             }
         };

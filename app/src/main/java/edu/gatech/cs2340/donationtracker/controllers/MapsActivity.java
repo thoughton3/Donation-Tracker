@@ -2,6 +2,7 @@ package edu.gatech.cs2340.donationtracker.controllers;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,7 +27,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        FragmentManager map = getSupportFragmentManager();
+        SupportMapFragment mapFragment = (SupportMapFragment) map
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
@@ -52,12 +54,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (Location location : Model.getLocationList()) {
             LatLng marker = new LatLng(Double.parseDouble(location.getLatitude()),
                     Double.parseDouble(location.getLongitude()));
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(marker);
+            String name = location.getLocationName();
+            markerOptions.title(name);
             mMap.addMarker(
-                    new MarkerOptions().position(marker).title(location.getLocationName()).snippet(
+                    markerOptions.snippet(
                             location.getPhoneNumber()));
         }
-        double atllat = 33.7490;
-        double atllong = -84.3880;
+        final double atllat = 33.7490;
+        final double atllong = -84.3880;
         LatLng atlanta = new LatLng(atllat, atllong);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(atlanta, 10));
     }

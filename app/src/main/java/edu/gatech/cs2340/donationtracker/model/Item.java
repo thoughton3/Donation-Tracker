@@ -32,7 +32,8 @@ public class Item {
      * @param comments comments about the Item
      * @param location location of the Item
      */
-    public Item(String shortDescription, String fullDescription, double value, ItemType category,
+    public Item(@NonNull String shortDescription, String fullDescription,
+                double value, ItemType category,
                 String comments, Location location) {
         this.shortDescription = shortDescription;
         this.fullDescription = fullDescription;
@@ -52,7 +53,7 @@ public class Item {
      * @param location location of the Item
      */
     @Ignore
-    public Item(String shortDescription, String fullDescription, double value,
+    public Item(@NonNull String shortDescription, String fullDescription, double value,
                 String categoryString, String comments, Location location) {
         this.shortDescription = shortDescription;
         this.fullDescription = fullDescription;
@@ -74,6 +75,7 @@ public class Item {
      * getter for short description
      * @return the shortDescription of the Item
      */
+    @NonNull
     public String getShortDescription() {
         return shortDescription;
     }
@@ -129,9 +131,12 @@ public class Item {
         this.categoryString = categoryString;
     }
 
+
     @Override
     public boolean equals(Object obj) {
-        return this.getShortDescription().equals(((Item) obj).getShortDescription());
+        String description = this.getShortDescription();
+        return (obj instanceof Item) &&
+                (description.equals(((Item) obj).getShortDescription()));
     }
 
 }

@@ -4,6 +4,7 @@ package edu.gatech.cs2340.donationtracker.model;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.RoomDatabase.Builder;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
@@ -25,13 +26,11 @@ public abstract class AppDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "word_database")
-                            // Wipes and rebuilds instead of migrating
-                            // if no Migration object.
-                            // Migration is not part of this practical.
-                            .allowMainThreadQueries()
-                            .build();
+                    Builder<edu.gatech.cs2340.donationtracker.model.AppDatabase> build =
+                            Room.databaseBuilder(context.getApplicationContext(),
+                            AppDatabase.class, "word_database");
+                    build.allowMainThreadQueries();
+                    INSTANCE = build.build();
                 }
             }
         }
